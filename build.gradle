@@ -1,0 +1,62 @@
+plugins {
+    id 'application'
+    id 'idea'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.50'
+    id "com.google.protobuf" version "0.8.10"
+}
+
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    def kotlinVersion = plugins.findPlugin("org.jetbrains.kotlin.jvm").kotlinPluginVersion
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}"
+    implementation "io.grpc:grpc-netty-shaded:${grpcVersion}"
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+    compileOnly "javax.annotation:javax.annotation-api:1.2"
+
+    testImplementation "io.grpc:grpc-testing:${grpcVersion}" // gRCP testing utilities
+}
+
+// this is what causes the proto files to be compiled
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.9.1'
+    }
+    plugins {
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
+        }
+    }
+    generateProtoTasks {
+        ofSourceSet('main')*.plugins {
+            grpc { }
+        }
+    }
+}
+
+startScripts.enabled = false
+
+task helloWorldServer(type: CreateStartScripts) {
+    mainClassName = 'io.grpc.examples.helloworld.server.MainKt'
+    applicationName = 'hello-world-server'
+    outputDir = new File(project.buildDir, 'tmp')
+    classpath = startScripts.classpath
+}
+
+task helloWorldClient(type: CreateStartScripts) {
+    mainClassName = 'io.grpc.examples.helloworld.client.MainKt'
+    applicationName = 'hello-world-client'
+    outputDir = new File(project.buildDir, 'tmp')
+    classpath = startScripts.classpath
+}
+
+applicationDistribution.into('bin') {
+    from(helloWorldServer)
+    from(helloWorldClient)
+    fileMode = 0755
+}
