@@ -11,7 +11,7 @@ fun main() {
 
     println("sending requests")
     for (i in 0..99) {
-        val req = HelloRequest.newBuilder().setName("Dave $i").build()
+        val req = HelloRequest.newBuilder().setFirstName("Dave").setLastName(("$i")).build()
         println("received response: '${stub.sayHello(req).message}'")
     }
 }
