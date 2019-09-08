@@ -8,14 +8,10 @@ fun main() {
     println("client started")
     val channel = ManagedChannelBuilder.forAddress("localhost", 5000).usePlaintext().build()
     val stub = GreeterGrpc.newBlockingStub(channel)
-    val req = HelloRequest.newBuilder().setName("Dave").build()
 
     println("sending requests")
-    println("received response: '${stub.sayHello(req).message}'")
-    println("received response: '${stub.sayHello(req).message}'")
-    println("received response: '${stub.sayHello(req).message}'")
-    println("received response: '${stub.sayHello(req).message}'")
-    println("received response: '${stub.sayHello(req).message}'")
-    println("received response: '${stub.sayHello(req).message}'")
-    println("received response: '${stub.sayHello(req).message}'")
+    for (i in 0..99) {
+        val req = HelloRequest.newBuilder().setName("Dave $i").build()
+        println("received response: '${stub.sayHello(req).message}'")
+    }
 }
